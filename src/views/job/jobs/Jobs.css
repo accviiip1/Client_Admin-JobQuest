@@ -1,0 +1,71 @@
+/* Custom styles for action buttons */
+.action-btn {
+  min-width: 80px !important;
+  height: 32px !important;
+  font-size: 12px !important;
+  padding: 4px 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+/* Ensure consistent button sizing */
+.action-btn span {
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* Icon sizing */
+.action-btn .c-icon {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+/* Button group spacing */
+.d-flex.gap-1 {
+  gap: 4px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .action-btn {
+    min-width: 70px !important;
+    font-size: 11px !important;
+    padding: 3px 6px !important;
+  }
+  
+  .action-btn span {
+    display: none;
+  }
+  
+  .action-btn .c-icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
