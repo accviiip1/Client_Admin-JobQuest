@@ -32,6 +32,7 @@
     "chart.js": "^4.5.0",
     "classnames": "^2.5.1",
     "core-js": "^3.45.0",
+    "dayjs": "^1.11.18",
     "formik": "^2.4.6",
     "js-cookie": "^3.0.5",
     "prop-types": "^15.8.1",
