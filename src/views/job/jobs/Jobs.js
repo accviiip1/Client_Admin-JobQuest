@@ -8,6 +8,7 @@ import axios from 'axios'
 import { useToast } from '../../../components/GlobalToast'
 import AddOrEditDialog from './AddOrEditDialog'
 import SearchBox from '../../../components/SearchBox'
+import Loading from '../../../components/Loading'
 import '../../../components/SearchBox.css'
 import './Jobs.css'
 
@@ -19,7 +20,7 @@ const Jobs = () => {
   const [openDialog, setOpenDialog] = useState(false)
   const [editData, setEditData] = useState(null)
   const [formError, setFormError] = useState("")
-  const [statusFilter, setStatusFilter] = useState('all') // all, 0, 1, 2
+  const [statusFilter, setStatusFilter] = useState('all') // all, 0, 1, 2, expiring
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredJobs, setFilteredJobs] = useState([])
 
@@ -27,6 +28,18 @@ const Jobs = () => {
     if (statusFilter === 'all') {
       const res = await makeRequest.get('/job?limit=100')
       return res.data?.data || []
+    } else if (statusFilter === 'expiring') {
+      // Lấy jobs sắp hết hạn (trong 7 ngày tới)
+      const res = await makeRequest.get('/job?limit=100')
+      const allJobs = res.data?.data || []
+      const now = new Date()
+      const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+      
+      return allJobs.filter(job => {
+        if (!job.deadline || job.status !== 1) return false
+        const deadline = new Date(job.deadline)
+        return deadline >= now && deadline <= sevenDaysFromNow
+      })
     } else {
       const res = await makeRequest.get(`/job?status=${statusFilter}&limit=100`)
       return res.data?.data || []
@@ -168,7 +181,7 @@ const Jobs = () => {
     }
   }
 
-  if (isLoading) return <div>Đang tải...</div>
+  if (isLoading) return <Loading text="Đang tải danh sách việc làm..." />
   if (error) return <div>Lỗi: {String(error.message || error)}</div>
 
   return (
@@ -205,6 +218,13 @@ const Jobs = () => {
                 onClick={() => setStatusFilter('2')}
               >
                 Từ chối
+              </CButton>
+              <CButton 
+                color={statusFilter === 'expiring' ? 'warning' : 'outline-warning'} 
+                size="sm" 
+                onClick={() => setStatusFilter('expiring')}
+              >
+                ⚠️ Sắp hết hạn
               </CButton>
             </CButtonGroup>
           </div>
@@ -246,6 +266,8 @@ const Jobs = () => {
                   <CTableHeaderCell style={{ width: 160 }}>Type</CTableHeaderCell>
                   <CTableHeaderCell style={{ width: 160 }}>Education</CTableHeaderCell>
                   <CTableHeaderCell style={{ width: 160 }}>Experience</CTableHeaderCell>
+                  <CTableHeaderCell style={{ width: 160 }}>Deadline</CTableHeaderCell>
+                  <CTableHeaderCell style={{ width: 120 }}>Days Left</CTableHeaderCell>
                   <CTableHeaderCell style={{ width: 220 }}>Created</CTableHeaderCell>
                   <CTableHeaderCell style={{ width: 220 }}>Deleted</CTableHeaderCell>
                 </CTableRow>
@@ -318,12 +340,35 @@ const Jobs = () => {
                     <CTableDataCell className="text-truncate text-nowrap" title={item.typeWork}>{item.typeWork}</CTableDataCell>
                     <CTableDataCell className="text-truncate text-nowrap" title={item.education}>{item.education}</CTableDataCell>
                     <CTableDataCell className="text-truncate text-nowrap" title={item.experience}>{item.experience}</CTableDataCell>
+                    <CTableDataCell className="text-truncate text-nowrap" title={item.deadline ? new Date(item.deadline).toLocaleDateString('vi-VN') : 'N/A'}>
+                      {item.deadline ? new Date(item.deadline).toLocaleDateString('vi-VN') : 'N/A'}
+                    </CTableDataCell>
+                    <CTableDataCell className="text-center">
+                      {item.deadline ? (() => {
+                        const now = new Date()
+                        const deadline = new Date(item.deadline)
+                        const diffTime = deadline - now
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+                        
+                        if (diffDays < 0) {
+                          return <CBadge color="danger">Hết hạn</CBadge>
+                        } else if (diffDays <= 1) {
+                          return <CBadge color="danger">{diffDays} ngày</CBadge>
+                        } else if (diffDays <= 3) {
+                          return <CBadge color="warning">{diffDays} ngày</CBadge>
+                        } else if (diffDays <= 7) {
+                          return <CBadge color="info">{diffDays} ngày</CBadge>
+                        } else {
+                          return <CBadge color="success">{diffDays} ngày</CBadge>
+                        }
+                      })() : <CBadge color="secondary">N/A</CBadge>}
+                    </CTableDataCell>
                     <CTableDataCell className="text-truncate text-nowrap" title={String(item.createdAt)}>{String(item.createdAt)}</CTableDataCell>
                     <CTableDataCell className="text-truncate text-nowrap" title={String(item.deletedAt)}>{String(item.deletedAt || '')}</CTableDataCell>
                   </CTableRow>
                 )) : (
                   <CTableRow>
-                    <CTableDataCell colSpan={17} className="text-center">Không có dữ liệu</CTableDataCell>
+                    <CTableDataCell colSpan={19} className="text-center">Không có dữ liệu</CTableDataCell>
                   </CTableRow>
                 )}
               </CTableBody>

@@ -7,6 +7,7 @@ import makeRequest from "../../../makeRequest";
 import AddOrEditDialog from "./AddOrEditDialog";
 import axios from "axios";
 import { useToast } from "../../../components/GlobalToast";
+import Loading from "../../../components/Loading";
 import SearchBox from "../../../components/SearchBox";
 import "../../../components/SearchBox.css";
 
@@ -156,7 +157,7 @@ const Users = () => {
       }
     }
 
-  if (isLoading) return <div>Đang tải...</div>;
+  if (isLoading) return <Loading text="Đang tải danh sách người dùng..." />;
   if (error) return <div>Lỗi: {error.message}</div>;
 
   return (

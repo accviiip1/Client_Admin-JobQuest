@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import makeRequest from '../../makeRequest'
 import axios from 'axios'
 import { useToast } from '../../components/GlobalToast'
+import Loading from '../../components/Loading'
 import AddOrEditDialog from './AddOrEditDialog'
 import SearchBox from '../../components/SearchBox'
 import '../../components/SearchBox.css'
@@ -100,7 +101,7 @@ const Follow = () => {
     }
   }
 
-  if (isLoading) return <div>Đang tải...</div>
+  if (isLoading) return <Loading text="Đang tải danh sách theo dõi..." />
   if (error) return <div>Lỗi: {String(error.message || error)}</div>
 
   return (

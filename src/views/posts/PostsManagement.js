@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { makeRequest } from '../../axios';
-import { useToast } from '../../components/GlobalToast';
+import { useToast } from '../../components/GlobalToast'
+import Loading from '../../components/Loading';
 import SearchBox from '../../components/SearchBox';
 import '../../components/SearchBox.css';
 import './PostsManagement.scss';
@@ -332,7 +333,7 @@ export default function PostsManagement() {
         </div>
         
         {loading ? (
-          <div className="loading">Đang tải...</div>
+          <Loading text="Đang tải bài viết..." />
         ) : (
           <div className="posts-table">
             <table>

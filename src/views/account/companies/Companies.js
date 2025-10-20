@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import makeRequest from "../../../makeRequest";
 import axios from "axios";
 import { useToast } from "../../../components/GlobalToast";
+import Loading from "../../../components/Loading";
 
 const Companies = () => {
   useEffect(() => {
@@ -122,7 +123,7 @@ const Companies = () => {
     }
   }
 
-  if (isLoading) return <div>Đang tải...</div>
+  if (isLoading) return <Loading text="Đang tải danh sách công ty..." />
   if (error) return <div>Lỗi: {String(error.message || error)}</div>
 
   return (
@@ -201,6 +202,10 @@ const Companies = () => {
                   <CTableHeaderCell style={{ width: 160 }}>Province</CTableHeaderCell>
                   <CTableHeaderCell style={{ width: 200 }}>Scale</CTableHeaderCell>
                   <CTableHeaderCell style={{ width: 200 }}>Website</CTableHeaderCell>
+                  <CTableHeaderCell style={{ width: 160 }}>Deadline</CTableHeaderCell>
+                  <CTableHeaderCell style={{ width: 120 }}>Days Left</CTableHeaderCell>
+                  <CTableHeaderCell style={{ width: 220 }}>Created</CTableHeaderCell>
+                  <CTableHeaderCell style={{ width: 220 }}>Deleted</CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody>
@@ -226,10 +231,35 @@ const Companies = () => {
                     <CTableDataCell className="text-truncate" style={{ maxWidth: 220 }}>
                       <span title={item.web} className="text-nowrap d-inline-block" style={{ maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.web}</span>
                     </CTableDataCell>
+                    <CTableDataCell className="text-truncate text-nowrap" title={item.deadline ? new Date(item.deadline).toLocaleDateString('vi-VN') : 'N/A'}>
+                      {item.deadline ? new Date(item.deadline).toLocaleDateString('vi-VN') : 'N/A'}
+                    </CTableDataCell>
+                    <CTableDataCell className="text-center">
+                      {item.deadline ? (() => {
+                        const now = new Date()
+                        const deadline = new Date(item.deadline)
+                        const diffTime = deadline - now
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+                        
+                        if (diffDays < 0) {
+                          return <CBadge color="danger">Hết hạn</CBadge>
+                        } else if (diffDays <= 1) {
+                          return <CBadge color="danger">{diffDays} ngày</CBadge>
+                        } else if (diffDays <= 3) {
+                          return <CBadge color="warning">{diffDays} ngày</CBadge>
+                        } else if (diffDays <= 7) {
+                          return <CBadge color="info">{diffDays} ngày</CBadge>
+                        } else {
+                          return <CBadge color="success">{diffDays} ngày</CBadge>
+                        }
+                      })() : <CBadge color="secondary">N/A</CBadge>}
+                    </CTableDataCell>
+                    <CTableDataCell className="text-truncate text-nowrap" title={String(item.created_at)}>{item.created_at ? new Date(item.created_at).toLocaleString('vi-VN') : 'N/A'}</CTableDataCell>
+                    <CTableDataCell className="text-truncate text-nowrap" title={String(item.deletedAt || '')}>{item.deletedAt ? new Date(item.deletedAt).toLocaleString('vi-VN') : 'N/A'}</CTableDataCell>
                   </CTableRow>
                 )) : (
                   <CTableRow>
-                    <CTableDataCell colSpan={9} className="text-center">Không có dữ liệu</CTableDataCell>
+                    <CTableDataCell colSpan={13} className="text-center">Không có dữ liệu</CTableDataCell>
                   </CTableRow>
                 )}
               </CTableBody>

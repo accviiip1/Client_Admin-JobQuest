@@ -52,6 +52,7 @@ const AddOrEditDialog = ({ open, onClose, currentItem, onSubmit, error, setError
           typeWork: currentItem?.typeWork || '',
           education: currentItem?.education || '',
           experience: currentItem?.experience || '',
+          deadline: currentItem?.deadline || '',
           status: currentItem?.status !== undefined ? currentItem.status : 0,
         }}
         validationSchema={Yup.object({
@@ -137,6 +138,16 @@ const AddOrEditDialog = ({ open, onClose, currentItem, onSubmit, error, setError
                 </CCol>
                 <CCol xs={12} md={6}>
                   <CFormInput label="Experience" name="experience" value={values.experience} onChange={handleChange} />
+                </CCol>
+
+                <CCol xs={12} md={6}>
+                  <CFormInput 
+                    label="Deadline" 
+                    name="deadline" 
+                    type="datetime-local" 
+                    value={values.deadline ? new Date(values.deadline).toISOString().slice(0, 16) : ''} 
+                    onChange={handleChange} 
+                  />
                 </CCol>
 
                 <CCol xs={12} md={6}>
